@@ -30,7 +30,15 @@ const Settings = ({
     { name: 'Red', value: '#ef4444', gradient: 'from-red-500 to-red-600' },
     { name: 'Pink', value: '#ec4899', gradient: 'from-pink-500 to-pink-600' },
     { name: 'Teal', value: '#14b8a6', gradient: 'from-teal-500 to-teal-600' },
-    { name: 'Amber', value: '#f59e0b', gradient: 'from-amber-500 to-amber-600' }
+    { name: 'Amber', value: '#f59e0b', gradient: 'from-amber-500 to-amber-600' },
+    { name: 'Indigo', value: '#6366f1', gradient: 'from-indigo-500 to-indigo-600' },
+    { name: 'Cyan', value: '#06b6d4', gradient: 'from-cyan-500 to-cyan-600' },
+    { name: 'Lime', value: '#65a30d', gradient: 'from-lime-500 to-lime-600' },
+    { name: 'Rose', value: '#f43f5e', gradient: 'from-rose-500 to-rose-600' },
+    { name: 'Yellow', value: '#eab308', gradient: 'from-yellow-500 to-yellow-600' },
+    { name: 'Emerald', value: '#059669', gradient: 'from-emerald-600 to-emerald-700' },
+    { name: 'Sky', value: '#0ea5e9', gradient: 'from-sky-500 to-sky-600' },
+    { name: 'Fuchsia', value: '#d946ef', gradient: 'from-fuchsia-500 to-fuchsia-600' }
   ];
 
   const handleSaveName = () => {

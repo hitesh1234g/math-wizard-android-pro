@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Calculator as CalculatorIcon, Settings as SettingsIcon, History as HistoryIcon } from 'lucide-react';
 import Settings from './Settings';
@@ -278,6 +279,7 @@ const Calculator = () => {
     if (type === 'operator') {
       return {
         background: `linear-gradient(145deg, ${buttonColor}, ${buttonColor}dd)`,
+        color: 'white'
       };
     }
     return {};
@@ -288,27 +290,30 @@ const Calculator = () => {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <CalculatorIcon className="text-primary w-8 h-8" />
+          <CalculatorIcon style={{ color: buttonColor }} className="w-8 h-8" />
           <h1 className="text-xl font-semibold text-calc-text-primary">{calculatorName}</h1>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowHistory(true)}
-            className="p-2 rounded-lg bg-calc-btn-function text-white hover:bg-opacity-80 transition-colors"
+            className="p-2 rounded-lg text-white hover:bg-opacity-80 transition-colors"
+            style={{ backgroundColor: buttonColor }}
             title="History"
           >
             <HistoryIcon className="w-5 h-5" />
           </button>
           <button
             onClick={() => setShowSettings(true)}
-            className="p-2 rounded-lg bg-calc-btn-function text-white hover:bg-opacity-80 transition-colors"
+            className="p-2 rounded-lg text-white hover:bg-opacity-80 transition-colors"
+            style={{ backgroundColor: buttonColor }}
             title="Settings"
           >
             <SettingsIcon className="w-5 h-5" />
           </button>
           <button
             onClick={() => setIsScientific(!isScientific)}
-            className="px-4 py-2 rounded-lg bg-calc-btn-function text-white text-sm font-medium hover:bg-opacity-80 transition-colors"
+            className="px-4 py-2 rounded-lg text-white text-sm font-medium hover:bg-opacity-80 transition-colors"
+            style={{ backgroundColor: buttonColor }}
           >
             {isScientific ? 'Basic' : 'Scientific'}
           </button>
@@ -356,7 +361,7 @@ const Calculator = () => {
         <button onClick={handlePercentage} className="calc-button-function">%</button>
         <button 
           onClick={() => handleOperator('÷')} 
-          className="calc-button-operator"
+          className="calc-button"
           style={getButtonStyle('operator')}
         >
           ÷
@@ -368,7 +373,7 @@ const Calculator = () => {
         <button onClick={() => handleNumber('9')} className="calc-button">9</button>
         <button 
           onClick={() => handleOperator('×')} 
-          className="calc-button-operator"
+          className="calc-button"
           style={getButtonStyle('operator')}
         >
           ×
@@ -380,7 +385,7 @@ const Calculator = () => {
         <button onClick={() => handleNumber('6')} className="calc-button">6</button>
         <button 
           onClick={() => handleOperator('−')} 
-          className="calc-button-operator"
+          className="calc-button"
           style={getButtonStyle('operator')}
         >
           −
@@ -392,7 +397,7 @@ const Calculator = () => {
         <button onClick={() => handleNumber('3')} className="calc-button">3</button>
         <button 
           onClick={() => handleOperator('+')} 
-          className="calc-button-operator"
+          className="calc-button"
           style={getButtonStyle('operator')}
         >
           +
@@ -403,7 +408,7 @@ const Calculator = () => {
         <button onClick={handleDecimal} className="calc-button">.</button>
         <button 
           onClick={handleEquals} 
-          className="calc-button-operator"
+          className="calc-button"
           style={getButtonStyle('operator')}
         >
           =
@@ -413,7 +418,7 @@ const Calculator = () => {
       {/* Memory indicator */}
       {state.memory !== 0 && (
         <div className="mt-4 text-center">
-          <span className="text-primary text-sm font-medium">
+          <span className="text-sm font-medium" style={{ color: buttonColor }}>
             Memory: {state.memory}
           </span>
         </div>
