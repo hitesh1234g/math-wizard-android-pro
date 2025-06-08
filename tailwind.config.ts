@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,7 +62,15 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
-				}
+				},
+				// Calculator specific colors
+				'calc-bg': '#1a1a1a',
+				'calc-display': '#2d2d2d',
+				'calc-btn-primary': '#333333',
+				'calc-btn-operator': '#ff9500',
+				'calc-btn-function': '#505050',
+				'calc-text-primary': '#ffffff',
+				'calc-text-secondary': '#a0a0a0'
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -84,11 +93,17 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'button-press': {
+					'0%': { transform: 'scale(1)' },
+					'50%': { transform: 'scale(0.95)' },
+					'100%': { transform: 'scale(1)' }
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'button-press': 'button-press 0.1s ease-out'
 			}
 		}
 	},
