@@ -1,6 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
-import { Calculator as CalculatorIcon } from 'lucide-react';
+import { Calculator as CalculatorIcon, Settings as SettingsIcon, History as HistoryIcon } from 'lucide-react';
+import Settings from './Settings';
+import History, { HistoryEntry } from './History';
 
 interface CalculatorState {
   display: string;
@@ -20,6 +21,12 @@ const Calculator = () => {
   });
 
   const [isScientific, setIsScientific] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
+  const [calculatorName, setCalculatorName] = useState('Calculator Pro');
+  const [buttonColor, setButtonColor] = useState('#ff9500');
+  const [history, setHistory] = useState<HistoryEntry[]>([]);
+  const [currentExpression, setCurrentExpression] = useState('');
 
   // Handle keyboard input
   useEffect(() => {
@@ -71,9 +78,14 @@ const Calculator = () => {
         operator: nextOperator,
         waitingForNewValue: true
       }));
+      setCurrentExpression(`${inputValue} ${nextOperator}`);
     } else if (state.operator && !state.waitingForNewValue) {
       const currentValue = state.previousValue || 0;
       const newValue = calculate(currentValue, inputValue, state.operator);
+      
+      // Add to history
+      const expression = `${currentValue} ${state.operator} ${inputValue}`;
+      addToHistory(expression, String(newValue));
 
       setState(prev => ({
         ...prev,
@@ -82,12 +94,14 @@ const Calculator = () => {
         operator: nextOperator,
         waitingForNewValue: true
       }));
+      setCurrentExpression(`${newValue} ${nextOperator}`);
     } else {
       setState(prev => ({
         ...prev,
         operator: nextOperator,
         waitingForNewValue: true
       }));
+      setCurrentExpression(`${state.previousValue} ${nextOperator}`);
     }
   };
 
@@ -96,6 +110,11 @@ const Calculator = () => {
 
     if (state.previousValue !== null && state.operator) {
       const newValue = calculate(state.previousValue, inputValue, state.operator);
+      
+      // Add to history
+      const expression = `${state.previousValue} ${state.operator} ${inputValue}`;
+      addToHistory(expression, String(newValue));
+      
       setState(prev => ({
         ...prev,
         display: String(newValue),
@@ -103,6 +122,7 @@ const Calculator = () => {
         operator: null,
         waitingForNewValue: true
       }));
+      setCurrentExpression('');
     }
   };
 
@@ -228,27 +248,78 @@ const Calculator = () => {
     return value;
   };
 
+  const addToHistory = (expression: string, result: string) => {
+    const newEntry: HistoryEntry = {
+      id: Date.now().toString(),
+      expression,
+      result,
+      timestamp: new Date()
+    };
+    setHistory(prev => [newEntry, ...prev.slice(0, 49)]); // Keep last 50 entries
+  };
+
+  const handleClearHistory = () => {
+    setHistory([]);
+  };
+
+  const handleSelectHistory = (entry: HistoryEntry) => {
+    setState(prev => ({
+      ...prev,
+      display: entry.result,
+      waitingForNewValue: true,
+      previousValue: null,
+      operator: null
+    }));
+    setCurrentExpression('');
+    setShowHistory(false);
+  };
+
+  const getButtonStyle = (type: 'operator' | 'function' | 'number') => {
+    if (type === 'operator') {
+      return {
+        background: `linear-gradient(145deg, ${buttonColor}, ${buttonColor}dd)`,
+      };
+    }
+    return {};
+  };
+
   return (
     <div className="max-w-md mx-auto bg-calc-bg p-6 rounded-3xl shadow-2xl">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <CalculatorIcon className="text-primary w-8 h-8" />
-          <h1 className="text-xl font-semibold text-calc-text-primary">Calculator Pro</h1>
+          <h1 className="text-xl font-semibold text-calc-text-primary">{calculatorName}</h1>
         </div>
-        <button
-          onClick={() => setIsScientific(!isScientific)}
-          className="px-4 py-2 rounded-lg bg-calc-btn-function text-white text-sm font-medium hover:bg-opacity-80 transition-colors"
-        >
-          {isScientific ? 'Basic' : 'Scientific'}
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowHistory(true)}
+            className="p-2 rounded-lg bg-calc-btn-function text-white hover:bg-opacity-80 transition-colors"
+            title="History"
+          >
+            <HistoryIcon className="w-5 h-5" />
+          </button>
+          <button
+            onClick={() => setShowSettings(true)}
+            className="p-2 rounded-lg bg-calc-btn-function text-white hover:bg-opacity-80 transition-colors"
+            title="Settings"
+          >
+            <SettingsIcon className="w-5 h-5" />
+          </button>
+          <button
+            onClick={() => setIsScientific(!isScientific)}
+            className="px-4 py-2 rounded-lg bg-calc-btn-function text-white text-sm font-medium hover:bg-opacity-80 transition-colors"
+          >
+            {isScientific ? 'Basic' : 'Scientific'}
+          </button>
+        </div>
       </div>
 
       {/* Display */}
       <div className="bg-calc-display rounded-2xl p-6 mb-6 text-right">
-        <div className="text-calc-text-secondary text-sm mb-1">
-          {state.operator && state.previousValue !== null && 
-            `${state.previousValue} ${state.operator}`}
+        <div className="text-calc-text-secondary text-sm mb-1 min-h-[1em]">
+          {currentExpression || (state.operator && state.previousValue !== null && 
+            `${state.previousValue} ${state.operator}`)}
         </div>
         <div className="text-calc-text-primary text-4xl font-light min-h-[1.2em] break-all">
           {formatDisplay(state.display)}
@@ -283,30 +354,60 @@ const Calculator = () => {
         <button onClick={handleClear} className="calc-button-function">C</button>
         <button onClick={handleBackspace} className="calc-button-function">⌫</button>
         <button onClick={handlePercentage} className="calc-button-function">%</button>
-        <button onClick={() => handleOperator('÷')} className="calc-button-operator">÷</button>
+        <button 
+          onClick={() => handleOperator('÷')} 
+          className="calc-button-operator"
+          style={getButtonStyle('operator')}
+        >
+          ÷
+        </button>
 
         {/* Row 2 */}
         <button onClick={() => handleNumber('7')} className="calc-button">7</button>
         <button onClick={() => handleNumber('8')} className="calc-button">8</button>
         <button onClick={() => handleNumber('9')} className="calc-button">9</button>
-        <button onClick={() => handleOperator('×')} className="calc-button-operator">×</button>
+        <button 
+          onClick={() => handleOperator('×')} 
+          className="calc-button-operator"
+          style={getButtonStyle('operator')}
+        >
+          ×
+        </button>
 
         {/* Row 3 */}
         <button onClick={() => handleNumber('4')} className="calc-button">4</button>
         <button onClick={() => handleNumber('5')} className="calc-button">5</button>
         <button onClick={() => handleNumber('6')} className="calc-button">6</button>
-        <button onClick={() => handleOperator('−')} className="calc-button-operator">−</button>
+        <button 
+          onClick={() => handleOperator('−')} 
+          className="calc-button-operator"
+          style={getButtonStyle('operator')}
+        >
+          −
+        </button>
 
         {/* Row 4 */}
         <button onClick={() => handleNumber('1')} className="calc-button">1</button>
         <button onClick={() => handleNumber('2')} className="calc-button">2</button>
         <button onClick={() => handleNumber('3')} className="calc-button">3</button>
-        <button onClick={() => handleOperator('+')} className="calc-button-operator">+</button>
+        <button 
+          onClick={() => handleOperator('+')} 
+          className="calc-button-operator"
+          style={getButtonStyle('operator')}
+        >
+          +
+        </button>
 
         {/* Row 5 */}
         <button onClick={() => handleNumber('0')} className="calc-button-zero">0</button>
         <button onClick={handleDecimal} className="calc-button">.</button>
-        <button onClick={handleEquals} className="calc-button-operator">=</button>
+        <button 
+          onClick={handleEquals} 
+          className="calc-button-operator"
+          style={getButtonStyle('operator')}
+        >
+          =
+        </button>
       </div>
 
       {/* Memory indicator */}
@@ -317,6 +418,25 @@ const Calculator = () => {
           </span>
         </div>
       )}
+
+      {/* Settings Modal */}
+      <Settings
+        isOpen={showSettings}
+        onClose={() => setShowSettings(false)}
+        calculatorName={calculatorName}
+        onNameChange={setCalculatorName}
+        buttonColor={buttonColor}
+        onColorChange={setButtonColor}
+      />
+
+      {/* History Modal */}
+      <History
+        isOpen={showHistory}
+        onClose={() => setShowHistory(false)}
+        history={history}
+        onClearHistory={handleClearHistory}
+        onSelectHistory={handleSelectHistory}
+      />
     </div>
   );
 };
